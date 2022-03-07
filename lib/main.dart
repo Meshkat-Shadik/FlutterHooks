@@ -21,29 +21,35 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Stream<String> getTime() => Stream.periodic(
-      const Duration(seconds: 1),
-      (_) =>
-          '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}',
-    );
-
 class MyHomePage extends HookWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final timeStream = useStream(getTime());
+    final textController = useTextEditingController();
+    final text = useState('');
+    useEffect(
+      () {
+        textController.addListener(() {
+          text.value = textController.text;
+        });
+        return null;
+      },
+      [textController],
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Hooks'),
-        actions: [Text(timeStream.data ?? '')],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
+          children: <Widget>[
+            TextField(
+              controller: textController,
+            ),
             Text(
-              'You have pushed the button this many times:',
+              text.value,
             ),
           ],
         ),
